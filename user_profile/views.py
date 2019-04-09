@@ -42,7 +42,7 @@ class HelloApiView(APIView):
         return Response({'method': 'put'})
 
     def patch(self, request, pk=None):
-        '''Patch request, only updates fields'provided in the request.'''
+        '''Patch request, only updates fields provided in the request.'''
 
         return Response({'method': 'patch'})
 
@@ -55,13 +55,47 @@ class HelloApiView(APIView):
 class HelloViewSet(viewsets.ViewSet):
     '''Test API ViewSet.'''
 
+    serializer_class = serializers.HelloSerializer
+
     def list(self, request):
         '''Returns a hello messsage'''
 
         a_viewset = [
-            'Uses actions (list, retrieve, update, partial_update)',
+            'Uses actions (list, create, retrieve, update, partial_update, destroy)',
             'Automatically maps URLs using Routers',
             'Provides more functionality with less code'
         ]
 
         return Response({'message': 'Hello', 'a_viewset': a_viewset})
+
+    def create(self, request):
+        '''Creates a new message.'''
+
+        serializer = serializers.HelloSerializer(data=request.data)
+
+        if serializer.is_valid():
+            name = serializer.data.get('name')
+            message = 'Hello {}'.format(name)
+            return Response({'message': message})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, pk=None):
+        '''Handles getting an object by its ID'''
+
+        return Response({'http_method': 'GET'})
+
+    def update(self, request, pk=None):
+        '''Updates a message'''
+
+        return Response({'http_method': 'PUT'})
+
+    def partial_update(self, request, pk=None):
+        '''updates fields only provided in the request'''
+
+        return Response({'http_method': 'PATCH'})
+
+    def destroy(self, request, pk=None):
+        '''deletes an object by its ID'''
+
+        return Response({'http_method': 'DELETE'})
